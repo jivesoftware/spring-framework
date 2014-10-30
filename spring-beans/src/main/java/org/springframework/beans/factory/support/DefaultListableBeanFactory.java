@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Provider;
 
@@ -369,14 +370,40 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				catch (CannotLoadBeanClassException ex) {
-					if (allowEagerInit) {
-						throw ex;
+                    if (ex.getResourceDescription().startsWith("URL [file") && ex.getResourceDescription()
+                            .contains("plugins"))
+                    {
+                        // There is a plugin that includes beans whose classes are missing. Remove these beans
+                        // and let the application loading continue
+                        this.beanDefinitionNames.remove(beanName);
+
+                        boolean pluginsFound = false;
+                        String pluginName= "";
+                        StringTokenizer st = new StringTokenizer(ex.getResourceDescription(), "/\\");
+                        while (st.hasMoreTokens()) {
+                            String token = st.nextToken();
+                            if ("plugins".equals(token)) {
+                                pluginsFound = true;
+                            }
+                            else if (pluginsFound) {
+                                pluginName = token;
+                                break;
+                            }
+                        }
+                        System.out.println("FATAL error found in plugin: " + pluginName
+                                + ". Plugin should be removed and a new version installed. Removing bean definition: "
+                                + beanName + " found in: " + ex.getResourceDescription());
+                    }
+                    else {
+						if (allowEagerInit) {
+							throw ex;
+						}
+						// Probably contains a placeholder: let's ignore it for type matching purposes.
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug("Ignoring bean class loading failure for bean '" + beanName + "'", ex);
+						}
+						onSuppressedException(ex);
 					}
-					// Probably contains a placeholder: let's ignore it for type matching purposes.
-					if (this.logger.isDebugEnabled()) {
-						this.logger.debug("Ignoring bean class loading failure for bean '" + beanName + "'", ex);
-					}
-					onSuppressedException(ex);
 				}
 				catch (BeanDefinitionStoreException ex) {
 					if (allowEagerInit) {
