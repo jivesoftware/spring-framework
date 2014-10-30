@@ -3,8 +3,14 @@ buildscript {
 		maven { url "http://repo.springsource.org/plugins-release" }
 	}
 	dependencies {
-		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.6")
+		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
 		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.8")
+	}
+}
+
+ext {
+	moduleProjects  = subprojects.findAll {
+		!it.name.equals('spring-build-src') && !it.name.equals('spring-framework-bom')
 	}
 }
 
@@ -138,10 +144,10 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		logging.captureStandardOutput LogLevel.INFO // suppress "## warnings" message
 	}
 
-	task sourcesJar(type: Jar, dependsOn:classes) {
-		classifier = "sources"
-		from sourceSets.main.allJava.srcDirs
-		include "**/*.java", "**/*.aj"
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+		// don't include or exclude anything explicitly by default. See SPR-12085.
 	}
 
 	task javadocJar(type: Jar) {
@@ -176,7 +182,7 @@ project("spring-core") {
 	// avoids including two different copies of asm unnecessarily. If however future cglib
 	// versions drift from the version of asm used by Spring internally, this duplication
 	// will become necessary.
-	def asmVersion = "5.0.2"
+	def asmVersion = "5.0.3"
 	def cglibVersion = "3.1"
 
 	configurations {
@@ -556,8 +562,8 @@ project("spring-orm-hibernate4") {
 		provided(project(":spring-jdbc"))
 		provided(project(":spring-tx"))
 		optional(project(":spring-web"))
-		optional("org.hibernate:hibernate-core:4.2.12.Final")
-		optional("org.hibernate:hibernate-entitymanager:4.2.12.Final")
+		optional("org.hibernate:hibernate-core:4.2.15.Final")
+		optional("org.hibernate:hibernate-entitymanager:4.2.15.Final")
 		optional("javax.servlet:servlet-api:2.5")
 	}
 }
@@ -873,7 +879,7 @@ configure(rootProject) {
 		testCompile("javax.inject:javax.inject:1")
 		testCompile("javax.resource:connector-api:1.5")
 		testCompile("org.aspectj:aspectjweaver:${aspectjVersion}")
-		testCompile("org.hibernate:hibernate-core:4.2.12.Final")
+		testCompile("org.hibernate:hibernate-core:4.2.15.Final")
 		testCompile("hsqldb:hsqldb:${hsqldbVersion}")
 	}
 
@@ -944,8 +950,8 @@ configure(rootProject) {
 		classifier = "schema"
 		description = "Builds -${classifier} archive containing all " +
 			"XSDs for deployment at http://springframework.org/schema."
-
-		subprojects.each { subproject ->
+		duplicatesStrategy 'exclude'
+		moduleProjects.each { subproject ->
 			def Properties schemas = new Properties();
 
 			subproject.sourceSets.main.resources.find {
@@ -991,7 +997,7 @@ configure(rootProject) {
 			into "${baseDir}/schema"
 		}
 
-		subprojects.each { subproject ->
+		moduleProjects.each { subproject ->
 			into ("${baseDir}/libs") {
 				from subproject.jar
 				if (subproject.tasks.findByPath("sourcesJar")) {

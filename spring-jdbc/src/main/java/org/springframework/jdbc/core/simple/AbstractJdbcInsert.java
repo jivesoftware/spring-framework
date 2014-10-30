@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ public abstract class AbstractJdbcInsert {
 	/** List of columns objects to be used in insert statement */
 	private final List<String> declaredColumns = new ArrayList<String>();
 
+	/** The names of the columns holding the generated key */
+	private String[] generatedKeyNames = new String[0];
+
 	/**
 	 * Has this operation been compiled? Compilation means at least checking
 	 * that a DataSource or JdbcTemplate has been provided, but subclasses
@@ -85,9 +88,6 @@ public abstract class AbstractJdbcInsert {
 
 	/** The SQL type information for the insert columns */
 	private int[] insertTypes;
-
-	/** The names of the columns holding the generated key */
-	private String[] generatedKeyNames = new String[0];
 
 
 	/**
@@ -119,7 +119,7 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Set the name of the table for this insert
+	 * Set the name of the table for this insert.
 	 */
 	public void setTableName(String tableName) {
 		checkIfConfigurationModificationIsAllowed();
@@ -127,14 +127,14 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Get the name of the table for this insert
+	 * Get the name of the table for this insert.
 	 */
 	public String getTableName() {
 		return this.tableMetaDataContext.getTableName();
 	}
 
 	/**
-	 * Set the name of the schema for this insert
+	 * Set the name of the schema for this insert.
 	 */
 	public void setSchemaName(String schemaName) {
 		checkIfConfigurationModificationIsAllowed();
@@ -142,14 +142,14 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Get the name of the schema for this insert
+	 * Get the name of the schema for this insert.
 	 */
 	public String getSchemaName() {
 		return this.tableMetaDataContext.getSchemaName();
 	}
 
 	/**
-	 * Set the name of the catalog for this insert
+	 * Set the name of the catalog for this insert.
 	 */
 	public void setCatalogName(String catalogName) {
 		checkIfConfigurationModificationIsAllowed();
@@ -157,14 +157,14 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Get the name of the catalog for this insert
+	 * Get the name of the catalog for this insert.
 	 */
 	public String getCatalogName() {
 		return this.tableMetaDataContext.getCatalogName();
 	}
 
 	/**
-	 * Set the names of the columns to be used
+	 * Set the names of the columns to be used.
 	 */
 	public void setColumnNames(List<String> columnNames) {
 		checkIfConfigurationModificationIsAllowed();
@@ -173,29 +173,14 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Get the names of the columns used
+	 * Get the names of the columns used.
 	 */
 	public List<String> getColumnNames() {
 		return Collections.unmodifiableList(this.declaredColumns);
 	}
 
 	/**
-	 * Get the names of any generated keys
-	 */
-	public String[] getGeneratedKeyNames() {
-		return this.generatedKeyNames;
-	}
-
-	/**
-	 * Set the names of any generated keys
-	 */
-	public void setGeneratedKeyNames(String[] generatedKeyNames) {
-		checkIfConfigurationModificationIsAllowed();
-		this.generatedKeyNames = generatedKeyNames;
-	}
-
-	/**
-	 * Specify the name of a single generated key column
+	 * Specify the name of a single generated key column.
 	 */
 	public void setGeneratedKeyName(String generatedKeyName) {
 		checkIfConfigurationModificationIsAllowed();
@@ -203,14 +188,31 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Specify whether the parameter metadata for the call should be used.  The default is true.
+	 * Set the names of any generated keys.
+	 */
+	public void setGeneratedKeyNames(String... generatedKeyNames) {
+		checkIfConfigurationModificationIsAllowed();
+		this.generatedKeyNames = generatedKeyNames;
+	}
+
+	/**
+	 * Get the names of any generated keys.
+	 */
+	public String[] getGeneratedKeyNames() {
+		return this.generatedKeyNames;
+	}
+
+	/**
+	 * Specify whether the parameter metadata for the call should be used.
+	 * The default is {@code true}.
 	 */
 	public void setAccessTableColumnMetaData(boolean accessTableColumnMetaData) {
 		this.tableMetaDataContext.setAccessTableColumnMetaData(accessTableColumnMetaData);
 	}
 
 	/**
-	 * Specify whether the default for including synonyms should be changed.  The default is false.
+	 * Specify whether the default for including synonyms should be changed.
+	 * The default is {@code false}.
 	 */
 	public void setOverrideIncludeSynonymsDefault(boolean override) {
 		this.tableMetaDataContext.setOverrideIncludeSynonymsDefault(override);
@@ -224,14 +226,14 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Get the insert string to be used
+	 * Get the insert string to be used.
 	 */
 	public String getInsertString() {
 		return this.insertString;
 	}
 
 	/**
-	 * Get the array of {@link java.sql.Types} to be used for insert
+	 * Get the array of {@link java.sql.Types} to be used for insert.
 	 */
 	public int[] getInsertTypes() {
 		return this.insertTypes;
@@ -311,7 +313,7 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Method to check whether we are allowd to make any configuration changes at this time.
+	 * Method to check whether we are allowed to make any configuration changes at this time.
 	 * If the class has been compiled, then no further changes to the configuration are allowed.
 	 */
 	protected void checkIfConfigurationModificationIsAllowed() {
@@ -449,12 +451,12 @@ public abstract class AbstractJdbcInsert {
 						"The getGeneratedKeys feature is not supported by this database");
 			}
 			if (getGeneratedKeyNames().length < 1) {
-				throw new InvalidDataAccessApiUsageException("Generated Key Name(s) not specificed. " +
+				throw new InvalidDataAccessApiUsageException("Generated Key Name(s) not specified. " +
 						"Using the generated keys features requires specifying the name(s) of the generated column(s)");
 			}
 			if (getGeneratedKeyNames().length > 1) {
 				throw new InvalidDataAccessApiUsageException(
-						"Current database only supports retreiving the key for a single column. There are " +
+						"Current database only supports retrieving the key for a single column. There are " +
 						getGeneratedKeyNames().length  + " columns specified: " + Arrays.asList(getGeneratedKeyNames()));
 			}
 			// This is a hack to be able to get the generated key from a database that doesn't support
@@ -542,10 +544,10 @@ public abstract class AbstractJdbcInsert {
 	 * @param batch array of Maps with parameter names and values to be used in batch insert
 	 * @return array of number of rows affected
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected int[] doExecuteBatch(Map<String, Object>[] batch) {
 		checkCompiled();
-		List<Object>[] batchValues = new ArrayList[batch.length];
+		List[] batchValues = new ArrayList[batch.length];
 		int i = 0;
 		for (Map<String, Object> args : batch) {
 			List<Object> values = matchInParameterValuesWithInsertColumns(args);
@@ -559,10 +561,10 @@ public abstract class AbstractJdbcInsert {
 	 * @param batch array of SqlParameterSource with parameter names and values to be used in insert
 	 * @return array of number of rows affected
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected int[] doExecuteBatch(SqlParameterSource[] batch) {
 		checkCompiled();
-		List<Object>[] batchValues = new ArrayList[batch.length];
+		List[] batchValues = new ArrayList[batch.length];
 		int i = 0;
 		for (SqlParameterSource parameterSource : batch) {
 			List<Object> values = matchInParameterValuesWithInsertColumns(parameterSource);
@@ -611,9 +613,9 @@ public abstract class AbstractJdbcInsert {
 	}
 
 	/**
-	 * Match the provided in parameter values with regitered parameters and parameters defined
+	 * Match the provided in parameter values with registered parameters and parameters defined
 	 * via metadata processing.
-	 * @param parameterSource the parameter vakues provided as a {@link SqlParameterSource}
+	 * @param parameterSource the parameter values provided as a {@link SqlParameterSource}
 	 * @return Map with parameter names and values
 	 */
 	protected List<Object> matchInParameterValuesWithInsertColumns(SqlParameterSource parameterSource) {

@@ -201,8 +201,11 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 	 */
 	public void setMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
 		Assert.notEmpty(messageConverters, "'messageConverters' must not be empty");
-		this.messageConverters.clear();
-		this.messageConverters.addAll(messageConverters);
+		// Take getMessageConverters() List as-is when passed in here
+		if (this.messageConverters != messageConverters) {
+			this.messageConverters.clear();
+			this.messageConverters.addAll(messageConverters);
+		}
 	}
 
 	/**
@@ -277,6 +280,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 		return execute(url, HttpMethod.GET, requestCallback, responseExtractor);
 	}
 
+
 	// HEAD
 
 	public HttpHeaders headForHeaders(String url, Object... urlVariables) throws RestClientException {
@@ -290,6 +294,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 	public HttpHeaders headForHeaders(URI url) throws RestClientException {
 		return execute(url, HttpMethod.HEAD, null, this.headersExtractor);
 	}
+
 
 	// POST
 
@@ -363,6 +368,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 		return execute(url, HttpMethod.POST, requestCallback, responseExtractor);
 	}
 
+
 	// PUT
 
 	public void put(String url, Object request, Object... urlVariables) throws RestClientException {
@@ -380,6 +386,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 		execute(url, HttpMethod.PUT, requestCallback, null);
 	}
 
+
 	// DELETE
 
 	public void delete(String url, Object... urlVariables) throws RestClientException {
@@ -393,6 +400,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 	public void delete(URI url) throws RestClientException {
 		execute(url, HttpMethod.DELETE, null, null);
 	}
+
 
 	// OPTIONS
 
@@ -410,6 +418,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 		HttpHeaders headers = execute(url, HttpMethod.OPTIONS, null, this.headersExtractor);
 		return headers.getAllow();
 	}
+
 
 	// exchange
 

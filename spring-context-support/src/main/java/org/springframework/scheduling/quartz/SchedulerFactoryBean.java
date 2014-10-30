@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,8 @@ import org.springframework.util.CollectionUtils;
  * @see org.quartz.impl.StdSchedulerFactory
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean
  */
-public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBean<Scheduler>, BeanNameAware,
-		ApplicationContextAware, InitializingBean, DisposableBean, SmartLifecycle {
+public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBean<Scheduler>,
+		BeanNameAware, ApplicationContextAware, InitializingBean, DisposableBean, SmartLifecycle {
 
 	public static final String PROP_THREAD_COUNT = "org.quartz.threadPool.threadCount";
 
@@ -310,7 +310,7 @@ public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBe
 	 * reference into the JobDataMap but rather into the SchedulerContext.
 	 * @param schedulerContextAsMap Map with String keys and any objects as
 	 * values (for example Spring-managed beans)
-	 * @see JobDetailBean#setJobDataAsMap
+	 * @see JobDetailFactoryBean#setJobDataAsMap
 	 */
 	public void setSchedulerContextAsMap(Map<String, ?> schedulerContextAsMap) {
 		this.schedulerContextMap = schedulerContextAsMap;
@@ -328,8 +328,8 @@ public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBe
 	 * correspond to a "setApplicationContext" method in that scenario.
 	 * <p>Note that BeanFactory callback interfaces like ApplicationContextAware
 	 * are not automatically applied to Quartz Job instances, because Quartz
-	 * itself is reponsible for the lifecycle of its Jobs.
-	 * @see JobDetailBean#setApplicationContextJobDataKey
+	 * itself is responsible for the lifecycle of its Jobs.
+	 * @see JobDetailFactoryBean#setApplicationContextJobDataKey
 	 * @see org.springframework.context.ApplicationContext
 	 */
 	public void setApplicationContextSchedulerContextKey(String applicationContextSchedulerContextKey) {
@@ -469,7 +469,6 @@ public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBe
 			// Make given non-transactional DataSource available for SchedulerFactory configuration.
 			configTimeNonTransactionalDataSourceHolder.set(this.nonTransactionalDataSource);
 		}
-
 
 		// Get Scheduler instance from SchedulerFactory.
 		try {
@@ -698,7 +697,7 @@ public class SchedulerFactoryBean extends SchedulerAccessor implements FactoryBe
 
 
 	//---------------------------------------------------------------------
-	// Implementation of Lifecycle interface
+	// Implementation of SmartLifecycle interface
 	//---------------------------------------------------------------------
 
 	public void start() throws SchedulingException {
