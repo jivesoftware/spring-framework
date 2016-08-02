@@ -346,4 +346,24 @@ public abstract class AopUtils {
 		}
 	}
 
+	/**
+	 * Check whether the specified class is a CGLIB-generated class.
+	 * @param clazz the class to check
+	 * @deprecated as of Spring 3.1 in favor of {@link ClassUtils#isCglibProxyClass(Class)}
+	 */
+	@Deprecated
+	public static boolean isCglibProxyClass(Class<?> clazz) {
+		return ClassUtils.isCglibProxyClass(clazz);
+	}
+
+	/**
+	 * Check whether the specified class name is a CGLIB-generated class.
+	 * @param className the class name to check
+	 * @deprecated as of Spring 3.1 in favor of {@link ClassUtils#isCglibProxyClassName(String)}
+	 */
+	@Deprecated
+	public static boolean isCglibProxyClassName(String className) {
+		return ClassUtils.isCglibProxyClassName(className);
+	}
+
 }

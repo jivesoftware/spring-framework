@@ -297,4 +297,13 @@ public class BeanDefinitionBuilder {
 		return this;
 	}
 
+	/**
+	 * Add an indexed constructor arg value. The current index is tracked internally
+	 * and all additions are at the present point.
+	 * @deprecated since Spring 2.5, in favor of {@link #addConstructorArgValue}
+	 */
+	@Deprecated
+	public BeanDefinitionBuilder addConstructorArg(Object value) {
+		return addConstructorArgValue(value);
+	}
 }
